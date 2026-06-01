@@ -1,0 +1,123 @@
+Localhost setup (XAMPP/WAMP) — Full working site
+1) Put project in web root
+XAMPP: copy folder to C:\xampp\htdocs\ecom
+WAMP: copy folder to C:\wamp64\www\ecom
+2) Create DB and import SQL
+Start Apache + MySQL in XAMPP/WAMP
+Open phpMyAdmin:
+http://localhost/phpmyadmin
+Import:
+Select Import
+Choose file: database.sql (inside your ecom folder)
+Click Go
+DB name created: makhana_shop
+3) Configure DB credentials (if required)
+Edit: includes/config.php
+
+DB_HOST = 127.0.0.1
+DB_USER = usually root
+DB_PASS = usually empty in XAMPP ('')
+DB_NAME = makhana_shop
+4) Open website
+http://localhost/ecom/
+Admin login (already created)
+Use this to access admin panel:
+
+Email: admin@makhana.local
+Password: admin123
+Go to: http://localhost/ecom/login.php
+After login:
+My Account -> Admin Panel
+In admin you can:
+
+Products: add/edit/delete + upload product images
+Orders: view/update status + payment status
+What’s included (all pages working)
+Storefront
+Home: index.php
+Shop (filters/sort): shop.php
+Product details: product.php?slug=...
+Cart: cart.php
+Checkout (COD + online placeholder): checkout.php
+Order success: order_success.php
+Customer
+Login/Register/Logout: login.php, register.php, logout.php
+My Account + Order history: account.php
+Static pages
+about.php, gift.php, contact.php
+privacy.php, terms.php, shipping.php, returns.php
+Newsletter
+Footer subscription posts to: subscribe.php (stored in DB table newsletter_subscribers)
+Payment gateway (pending) — instructions (India)
+Your checkout already supports:
+
+COD (works fully)
+Online (creates order as unpaid; gateway integration is pending)
+Recommended: Razorpay integration steps
+Create Razorpay account + get:
+Key ID
+Key Secret
+Add a new page (later):
+pay.php?order=ORDER_NUMBER This should:
+Fetch order by order_number
+Create Razorpay order via API for total amount (in paise)
+Render Razorpay Checkout script
+Razorpay success handler:
+Verify signature server-side
+If valid, update DB:
+orders.payment_status = 'paid'
+optionally orders.status = 'confirmed'
+Redirect to:
+order_success.php?order=...
+If you tell me which gateway you want (Razorpay / PayU / Cashfree), I’ll implement that integration next (only keys will be added in your config; no keys hardcoded).
+
+Mail (PHPMailer) — setup later
+This project includes PHPMailer in: vendor/phpmailer/
+
+Where mail is used
+1) B2B inquiry form
+- Page: /b2b.php
+- Submit handler: /b2b_submit.php
+- Sends inquiry mail to: nitishx13@gmail.com
+
+2) Admin dashboard “Send Mail” widget
+- Page: /admin/index.php
+- Submit handler: /admin/send_mail.php
+- Sends to: nitishx13@gmail.com
+
+Important note for localhost
+On XAMPP/WAMP, PHP "mail()" usually does NOT work by default.
+To send real emails you should configure SMTP.
+
+SMTP configuration (recommended)
+Mailer reads environment variables:
+SMTP_HOST
+SMTP_PORT (example: 587)
+SMTP_USER
+SMTP_PASS
+SMTP_SECURE (example: tls)
+MAIL_FROM_EMAIL
+MAIL_FROM_NAME
+
+How to set env vars (live hosting)
+- In cPanel/hosting: set these as environment variables.
+- If you deploy on VPS: set in Apache/Nginx/PHP-FPM env config.
+
+If you use Gmail SMTP
+- SMTP_HOST=smtp.gmail.com
+- SMTP_PORT=587
+- SMTP_SECURE=tls
+- SMTP_USER=yourgmail@gmail.com
+- SMTP_PASS=Gmail App Password (NOT your normal password)
+- MAIL_FROM_EMAIL=yourgmail@gmail.com
+- MAIL_FROM_NAME=Chaatku
+
+Testing
+1) Open /b2b.php and submit an inquiry
+2) Open /admin/ and use Send Mail card
+If SMTP is correct, you will receive email on nitishx13@gmail.com
+If it fails, the page shows "Mail failed: ..." error text.
+
+Status
+Complete ecommerce website built (PHP + MySQL) and runs on localhost
+Only payment gateway is pending (as requested)
